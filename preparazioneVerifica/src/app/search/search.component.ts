@@ -14,7 +14,16 @@ export class SearchComponent implements OnInit {
   results: any;
 
   // faccio iniettare lo food service e faccio una ricerca
-  constructor(public food: FoodService) {
+  constructor(public food: FoodService) { 
+    if (localStorage.getItem("dataSource") != null)
+    {
+      let data:any  = localStorage.getItem("dataSource");
+      this.results = JSON.parse(data)
+
+    }
+    else {
+      console.log("EMPTY []")
+    }
   }
   ngOnInit(): void {
   }
@@ -25,12 +34,23 @@ export class SearchComponent implements OnInit {
     }
     this.query = query.value;
     this.obsProd = this.food.searchProd(this.query);
-    this.obsProd.subscribe(
-      (data) => {
-        this.results = data;
-        console.log(this.results);
-        localStorage.setItem('dataSource', JSON.stringify(this.results));
-      });
+    this.obsProd.subscribe((data: any) => {
+      this.results = data;
+      console.log(this.results);
+      localStorage.setItem('dataSource', JSON.stringify(this.results));
+    });
+  }
 
+  renderResults(res: any): void {
+    this.results = null;
+    if (res && res.tracks && res.tracks.items) {
+      this.results = res.tracks.items;
+    }
+
+  }
+clear():boolean{
+  localStorage.removeItem("dataSource")
+  window.location.reload();
+  return true;
 }
 }
